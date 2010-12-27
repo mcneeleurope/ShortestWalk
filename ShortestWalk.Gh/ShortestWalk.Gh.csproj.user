@@ -1,0 +1,25 @@
+﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <StartAction>Program</StartAction>
+	
+	<!-- Please CHECK: your path might be different! -->
+	<StartProgram>C:\Programmi\Rhinoceros 4.0\System\rhino4.exe</StartProgram>
+
+    <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
+    <FallbackCulture>en-US</FallbackCulture>
+    <VerifyUploadedFiles>false</VerifyUploadedFiles>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ProjectView>ShowAllFiles</ProjectView>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug5|AnyCPU' ">
+    <StartProgram>C:\Program Files\Rhinoceros 5.0 WIP (64-bit)\System\rhino4.exe</StartProgram>
+    <StartAction>Program</StartAction>
+    <StartArguments>/dotnetversion=2</StartArguments>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug5H|AnyCPU' ">
+    <StartProgram>C:\Program Files (x86)\Rhinoceros 5.0 WIP\System\rhino4.exe</StartProgram>
+    <StartAction>Program</StartAction>
+    <StartArguments>/dotnetversion=2</StartArguments>
+  </PropertyGroup>
+</Project>
