@@ -121,7 +121,7 @@ namespace ShortestWalk.Geometry
 
         private static double HeuristicEstimateDistance(CurvesTopology top, int to, int y)
         {
-            return top.VertexAt(y).DistanceTo(top.VertexAt(to)) - 0.01;
+            return top.VertexAt(y).DistanceTo(top.VertexAt(to));
         }
 
         private static int FindMinimumFScoreAmongOpen(IList<int> open, double[] f_score)
