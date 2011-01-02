@@ -52,6 +52,8 @@ namespace ShortestWalk.Geometry
                 throw new ArgumentOutOfRangeException("to", "to is more than vertex length");
             if (from == to)
                 throw new ArgumentException("Walking indices from and to are the same");
+            if (dist == null)
+                throw new ArgumentNullException("dist");
             if (dist.Length < node.EdgeCount)
                 throw new ArgumentOutOfRangeException("dist", "There should be one distance for each edge");
 
