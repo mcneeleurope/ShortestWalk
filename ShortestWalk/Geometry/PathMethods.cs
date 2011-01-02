@@ -51,7 +51,9 @@ namespace ShortestWalk.Geometry
             if (to >= top.VertexLength)
                 throw new ArgumentOutOfRangeException("to", "to is more than vertex length");
             if (from == to)
-                throw new ArgumentException("walkFromIndex and walkToIndex are the same");
+                throw new ArgumentException("Walking indices from and to are the same");
+            if (dist.Length < node.EdgeCount)
+                throw new ArgumentOutOfRangeException("dist", "There should be one distance for each edge");
 
             Dictionary<int, byte> closed = new Dictionary<int, byte>(top.EdgeLength / 4);
             SortedList<int, byte> open = new SortedList<int, byte>(top.EdgeLength / 5);
