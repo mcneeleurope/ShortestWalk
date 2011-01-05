@@ -25,7 +25,7 @@ namespace ShortestWalk.Geometry
         /// <summary>
         /// Constructs a single topology
         /// </summary>
-        /// <param name="curves">The base curves</param>
+        /// <param name="curves">The array or list of curves that will be shallow copied. Modifying curves invalidates this class.</param>
         public CurvesTopology(IList<Curve> curves)
             : this(curves, 0)
         { }
@@ -33,7 +33,7 @@ namespace ShortestWalk.Geometry
         /// <summary>
         /// Constructs a single topology with tolerance
         /// </summary>
-        /// <param name="curves">The base curves</param>
+        /// <param name="curves">The array or list of curves that will be shallow copied. Modifying curves invalidates this class.</param>
         /// <param name="tolerance">A positive tolerance value, measured in document units</param>
         public CurvesTopology(IList<Curve> curves, double tolerance)
         {
