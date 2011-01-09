@@ -65,14 +65,6 @@ namespace ShortestWalkGh.Gh
                 {
                     var line = lines[i];
 
-                    if (!line.IsValid)
-                    {
-                        AddRuntimeMessage(GH_RuntimeMessageLevel.Warning,
-                            string.Format("Line number {0} is invalid", i.ToString()));
-                        result.Add(null);
-                        continue;
-                    }
-
                     int fromIndex = top.GetClosestNode(line.From);
                     int toIndex = top.GetClosestNode(line.To);
 
