@@ -54,7 +54,7 @@ namespace ShortestWalk.Geometry
                 throw new ArgumentException("Walking indices from and to are the same");
             if (dist == null)
                 throw new ArgumentNullException("dist");
-            if (dist.Length < node.EdgeCount)
+            if (dist.Length < top.EdgeLength)
                 throw new ArgumentOutOfRangeException("dist", "There should be one distance for each edge");
 
             Dictionary<int, byte> closed = new Dictionary<int, byte>(top.EdgeLength / 4);
@@ -118,6 +118,7 @@ namespace ShortestWalk.Geometry
             eDirs = null;
             return null;    //no path found. Error
         }
+
 
         private static double HeuristicEstimateDistance(CurvesTopology top, int to, int y)
         {
