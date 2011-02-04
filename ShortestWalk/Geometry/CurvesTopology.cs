@@ -397,6 +397,41 @@ namespace ShortestWalk.Geometry
             return distances;
         }
 
+        /// <summary>
+        /// Get the physical length of all input curves
+        /// </summary>
+        /// <returns>The ordered physical length of all input curves</returns>
+        public double[] MeasureAllEdgeLinearDistances()
+        {
+            double[] distances = new double[EdgeLength];
+            for (int i = 0; i < EdgeLength; i++)
+            {
+                var edge = EdgeAt(i);
+                distances[i] = LinearDistanceAt(edge);
+            }
+            return distances;
+        }
+
+        /// <summary>
+        /// Returns the linear distance of an edge
+        /// </summary>
+        /// <param name="edge">The edgeaddress</param>
+        /// <returns>The length</returns>
+        public double LinearDistanceAt(EdgeAddress edge)
+        {
+            return (VertexAt(edge.A) - VertexAt(edge.B)).Length;
+        }
+
+        /// <summary>
+        /// Returns the linear distance of an edge
+        /// </summary>
+        /// <param name="edgeIndex">The edge index</param>
+        /// <returns>The length</returns>
+        public double LinearDistanceAt(int edgeIndex)
+        {
+            return LinearDistanceAt(EdgeAt(edgeIndex));
+        }
+
         private struct VertexOnCurve
         {
             //public readonly int LinePosition;

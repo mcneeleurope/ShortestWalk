@@ -3,7 +3,7 @@ using System.Reflection;
 using Grasshopper.Kernel;
 using ShortestWalk.Gh.Properties;
 
-namespace ShortestWalkGh
+namespace ShortestWalk
 {
     [CLSCompliant(false)]
     public class ShortestWalk : GH_AssemblyInfo

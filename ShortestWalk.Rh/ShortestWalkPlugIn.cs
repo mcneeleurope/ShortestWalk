@@ -1,4 +1,5 @@
 ﻿using Rhino.PlugIns;
+using Rhino;
 
 namespace ShortestWalk.Rh
 {

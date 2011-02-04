@@ -17,25 +17,47 @@ namespace ShortestWalk.Rh
         readonly int _fromIndex;
         readonly double[] _distances;
         readonly CurvesTopology _crvTopology;
+        readonly SearchMode _sm;
+        readonly PathMethod _pathSearchMethod;
 
         public TrackingPointGetter(string prompt, CurvesTopology crvTopology)
-            : this(prompt, crvTopology, -1)
+            : this(prompt, crvTopology, -1, SearchMode.Links)
         {
         }
 
-        public TrackingPointGetter(string prompt, CurvesTopology crvTopology, int fromIndex)
+        public TrackingPointGetter(string prompt, CurvesTopology crvTopology, int fromIndex, SearchMode mode)
         {
             _crvTopology = crvTopology;
             _fromIndex = fromIndex;
+
+            if(!Enum.IsDefined(typeof(SearchMode), mode))
+                throw new ArgumentException("Enum is undefined.", "mode");
+            _sm = mode;
+            
 
             if (!string.IsNullOrEmpty(prompt))
                 _getPoint.SetCommandPrompt(prompt);
 
             if (fromIndex != -1)
             {
-                _distances = crvTopology.MeasureAllEdgeLengths();
+                switch(mode)
+                {
+                    case SearchMode.CurveLength:
+                        _distances = crvTopology.MeasureAllEdgeLengths();
+                        break;
+                    case SearchMode.LinearDistance:
+                        _distances = crvTopology.MeasureAllEdgeLinearDistances();
+                        break;
+                    case SearchMode.Links:
+                        _distances = null;
+                        break;
+                    default:
+                        throw new ApplicationException("Behaviour for this enum value is undefined.");
+                }
             }
             _getPoint.DynamicDraw += DynamicDraw;
+
+            _pathSearchMethod = PathMethod.FromMode(_sm, _crvTopology, _distances);
         }
 
         public double[] DistanceCache
@@ -51,9 +73,9 @@ namespace ShortestWalk.Rh
             index = -1;
 
             var oOn = ModelAidSettings.Osnap;
-            var oMode = ModelAidSettings.OSnapModes;
+            var oMode = ModelAidSettings.OsnapModes;
             ModelAidSettings.Osnap = true;
-            ModelAidSettings.OSnapModes |= (int)OSnapModes.End;
+            ModelAidSettings.OsnapModes = (OsnapModes)~0;
 
             if (_getPoint.Get() != GetResult.Point)
             {
@@ -63,7 +85,7 @@ namespace ShortestWalk.Rh
             index = _crvTopology.GetClosestNode(_getPoint.Point());
 
             ModelAidSettings.Osnap = oOn;
-            ModelAidSettings.OSnapModes = oMode;
+            ModelAidSettings.OsnapModes = oMode;
 
             if (index == -1)
                 return Result.Failure;
@@ -87,7 +109,7 @@ namespace ShortestWalk.Rh
 
                         if (_fromIndex != -1 && toIndex != _fromIndex)
                         {
-                            var c = PathMethods.AStar(_crvTopology, _fromIndex, toIndex, _distances);
+                            var c = _pathSearchMethod.Cross(_fromIndex, toIndex);
 
                             if (c != null)
                                 e.Display.DrawCurve(c, Color.Black, 3);
@@ -105,7 +127,7 @@ namespace ShortestWalk.Rh
             }
         }
 
-        public void Dispose()
+        public virtual void Dispose()
         {
             _getPoint.Dispose();
         }

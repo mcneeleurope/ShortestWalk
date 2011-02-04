@@ -7,6 +7,7 @@ using Rhino.Geometry;
 using Rhino.Input;
 using Rhino.Input.Custom;
 using ShortestWalk.Geometry;
+using ShortestWalk.Rh.Extensions;
 
 namespace ShortestWalk.Rh
 {
@@ -30,6 +31,8 @@ namespace ShortestWalk.Rh
 
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
+            SearchMode sm = SearchMode.CurveLength;
+
             Curve[] curves;
             OptionToggle tog = new OptionToggle(false, "Hide", "Show");
             OptionDouble tol = new OptionDouble(RhinoDoc.ActiveDoc.ModelAbsoluteTolerance, true, 0.0);
@@ -41,17 +44,26 @@ namespace ShortestWalk.Rh
                     getLines.EnableClearObjectsOnEntry(false);
                     int showInt = getLines.AddOptionToggle("Topology", ref tog);
                     int tolInt = getLines.AddOptionDouble("Tolerance", ref tol);
+                    int modeInt = GetterExtension.AddEnumOptionList(getLines, sm);
 
-                    if (getLines.Lines(1, 0, out curves))
+                    if (getLines.Curves(1, 0, out curves))
                         break;
                     else
                     {
-                        RhinoApp.WriteLine("Less than three lines were selected");
-
                         if (getLines.Result() == GetResult.Option)
+                        {
+                            if (getLines.Option().Index == modeInt)
+                            {
+                                sm = GetterExtension.RetrieveEnumOptionValue<SearchMode>
+                                    (getLines.Option().CurrentListOptionIndex);
+                            }
                             continue;
+                        }
                         else
+                        {
+                            RhinoApp.WriteLine("Less than three lines were selected");
                             return Result.Cancel;
+                        }
                     }
                 }
             }
@@ -71,54 +83,67 @@ namespace ShortestWalk.Rh
                 }
             }
 
-            int walkToIndex;
-            double[] distances;
-            using (var getEnd = new TrackingPointGetter("Select the end point", crvTopology, walkFromIndex))
+            Result wasSuccessful = Result.Cancel;
+
+            for (; ; )
             {
-                if (getEnd.GetPointOnTopology(out walkToIndex) != Result.Success)
+
+                int walkToIndex;
+                double[] distances;
+                using (var getEnd = new TrackingPointGetter("Select the end point", crvTopology, walkFromIndex, sm))
                 {
+                    if (getEnd.GetPointOnTopology(out walkToIndex) != Result.Success)
+                    {
+                        break;
+                    }
+                    distances = getEnd.DistanceCache;
+                }
+
+                if (walkFromIndex == walkToIndex)
+                {
+                    RhinoApp.WriteLine("Start and end points are equal");
                     EndOperations(ids);
-                    return Result.Cancel;
-                }
-                distances = getEnd.DistanceCache;
-            }
-
-            if (walkFromIndex == walkToIndex)
-            {
-                RhinoApp.WriteLine("Start and end points are equal");
-                EndOperations(ids);
-                return Result.Nothing;
-            }
-
-            int[] nIndices, eIndices;
-            bool[] eDirs;
-            Curve c = PathMethods.AStar(crvTopology, walkFromIndex, walkToIndex, distances, out nIndices, out eIndices, out eDirs);
-
-            Result wasSuccessful;
-            if (c != null && c.IsValid)
-            {
-                if (tog.CurrentValue)
-                {
-                    RhinoApp.WriteLine("Vertices: {0}", FormatNumbers(nIndices));
-                    RhinoApp.WriteLine("Edges: {0}", FormatNumbers(eIndices));
+                    return Result.Nothing;
                 }
 
-                var a = RhinoDoc.ActiveDoc.CreateDefaultAttributes();
-                Guid g = RhinoDoc.ActiveDoc.Objects.AddCurve(c, a);
+                PathMethod pathSearch = PathMethod.FromMode(sm, crvTopology, distances);
 
-                var obj = RhinoDoc.ActiveDoc.Objects.Find(g);
-                if (obj != null)
+                int[] nIndices, eIndices;
+                bool[] eDirs;
+                double totLength;
+                Curve c =
+                    pathSearch.Cross(walkFromIndex, walkToIndex, out nIndices, out eIndices, out eDirs, out totLength);
+
+                if (c != null && c.IsValid)
                 {
-                    obj.Select(true);
-                    wasSuccessful = Result.Success;
+                    if (tog.CurrentValue)
+                    {
+                        RhinoApp.WriteLine("Vertices: {0}", FormatNumbers(nIndices));
+                        RhinoApp.WriteLine("Edges: {0}", FormatNumbers(eIndices));
+                    }
+
+                    var a = RhinoDoc.ActiveDoc.CreateDefaultAttributes();
+                    Guid g = RhinoDoc.ActiveDoc.Objects.AddCurve(c, a);
+
+                    var obj = RhinoDoc.ActiveDoc.Objects.Find(g);
+                    if (obj != null)
+                    {
+                        obj.Select(true);
+                        wasSuccessful = Result.Success;
+                        walkFromIndex = walkToIndex;
+                    }
+                    else
+                    {
+                        RhinoApp.WriteLine("An error occurred while adding the new polycurve.");
+                        wasSuccessful = Result.Failure;
+                        break;
+                    }
                 }
                 else
-                    wasSuccessful = Result.Failure;
-            }
-            else
-            {
-                RhinoApp.WriteLine("No path was found. Either points are isolated, or an error occurred.");
-                wasSuccessful = Result.Nothing;
+                {
+                    RhinoApp.WriteLine("No path was found. Nodes are isolated.");
+                    wasSuccessful = Result.Nothing;
+                }
             }
 
             EndOperations(ids);

@@ -21,11 +21,11 @@ namespace ShortestWalk.Rh
         /// <summary>
         /// Use 0 as max if you do not want to set it.
         /// </summary>
-        /// <param name="min"></param>
-        /// <param name="max"></param>
+        /// <param name="min">The minimun number of lines</param>
+        /// <param name="max">The maximum, as in GetObject.GetMultiple()</param>
         /// <param name="lines"></param>
-        /// <returns></returns>
-        public bool Lines(int min, int max, out Curve[] lines)
+        /// <returns>True if the getting supplied the requested lines, false otherwise.</returns>
+        public bool Curves(int min, int max, out Curve[] lines)
         {
             GetResult a;
             if (min == 1 && max == 1)

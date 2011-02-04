@@ -3,9 +3,9 @@
     <StartAction>Program</StartAction>
 	
 	<!-- Please CHECK: your path might be different! -->
-	<StartProgram>C:\Programmi\Rhinoceros 4.0\System\rhino4.exe</StartProgram>
+	<!-- StartProgram>C:\Programmi\Rhinoceros 4.0\System\rhino4.exe</StartProgram -->
 	
-    <!-- StartProgram>C:\Program Files (x86)\Rhinoceros 4.0\System\rhino4.exe</StartProgram -->
+    <StartProgram>C:\Program Files (x86)\Rhinoceros 4.0\System\rhino4.exe</StartProgram>
     <EnableUnmanagedDebugging>false</EnableUnmanagedDebugging>
     <FallbackCulture>en-US</FallbackCulture>
     <VerifyUploadedFiles>false</VerifyUploadedFiles>
