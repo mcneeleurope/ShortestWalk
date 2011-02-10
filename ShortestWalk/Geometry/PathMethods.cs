@@ -469,7 +469,8 @@ namespace ShortestWalk.Geometry
     public enum SearchMode
     {
         CurveLength = 1,
-        LinearDistance = 2,
-        Links = 3,
+        //AdjustedCurveLength = 2,
+        LinearDistance = 3,
+        Links = 4,
     }
 }

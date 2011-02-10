@@ -62,16 +62,21 @@ namespace ShortestWalk.Geometry
             int[] verticesToWeldedVertices;
             IList<int> weldedVertexBounds;
             if (tolerance == 0)
+            {
                 weldedVertexBounds = RepetitionCounts(vls, _curves, out verticesToWeldedVertices);
+
+                _vPositions = new Point3d[weldedVertexBounds.Count];
+                SetupVerticesPositions(vls, weldedVertexBounds);
+            }
             else
             {
                 for (int i = 0; i < vls.Length; i++)
                     tmpUnweldedCopies[i] = vls[i].Locate(_curves);
                 weldedVertexBounds = RepetitionCounts(tmpUnweldedCopies, out verticesToWeldedVertices, _tolerance);
-            }
 
-            _vPositions = new Point3d[weldedVertexBounds.Count];
-            SetupVerticesPositions(vls, weldedVertexBounds);
+                _vPositions = new Point3d[weldedVertexBounds.Count];
+                SetupVerticesPositionsThatNeedToBeMapped(vls, verticesToWeldedVertices);
+            }
 
             _edges = new EdgeAddress[_curves.Length];
             SetupVerticesEndings(vls, verticesToWeldedVertices);
@@ -113,6 +118,17 @@ namespace ShortestWalk.Geometry
                 _vPositions[i] = v.Locate(_curves);
 
                 interim += weldedVertexBounds[i];
+            }
+        }
+
+        private void SetupVerticesPositionsThatNeedToBeMapped(VertexOnCurve[] vls, int[] map)
+        {
+            //This might be improved to avarage all different locations that are pointed to by the same node.
+            //Now the last one wins.
+            for (int i = 0; i < map.Length; i++)
+            {
+                var v = vls[i];
+                _vPositions[map[i]] = v.Locate(_curves);
             }
         }
 
@@ -537,6 +553,7 @@ namespace ShortestWalk.Geometry
             for (int i = 0; i < top.VertexLength; i++)
             {
                 dots[i] = RhinoDoc.ActiveDoc.Objects.AddTextDot(i.ToString(), top.VertexAt(i), oa);
+                var sette = top.VertexAt(i);
             }
 
             //Graph edges

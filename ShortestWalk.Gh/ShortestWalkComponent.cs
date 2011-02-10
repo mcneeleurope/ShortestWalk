@@ -21,7 +21,7 @@ namespace ShortestWalk.Gh
         protected override void RegisterInputParams(GH_Component.GH_InputParamManager pManager)
         {
             pManager.Register_CurveParam("Curves", "C", "The curves group", GH_ParamAccess.list);
-            pManager.Register_DoubleParam("Lengths", "L", "One length for each curve. If the number of lengths is less than the one of curves, length values are repeated in pattern", GH_ParamAccess.list);
+            pManager.Register_DoubleParam("Lengths", "L", "One length for each curve. If the number of lengths is less than the one of curves, length values are repeated in pattern.\nIf there are no lengths, then the physical length of the curves is computed.", GH_ParamAccess.list);
             pManager[1].Optional = true;
             pManager.Register_LineParam("Wanted path", "P", "The lines from the start to the end of the path", GH_ParamAccess.list);
         }
@@ -79,6 +79,7 @@ namespace ShortestWalk.Gh
                     return;
                 
                 CurvesTopology top = new CurvesTopology(curves, GH_Component.DocumentTolerance());
+                //CurvesTopologyPreview.Mark(top, Color.BurlyWood, Color.Bisque);
 
                 PathMethod pathSearch;
                 if (lengths.Count == 0)
@@ -140,14 +141,16 @@ namespace ShortestWalk.Gh
                         AddRuntimeMessage(GH_RuntimeMessageLevel.Warning,
                             string.Format("No walk found for line at position {0}. Are end points isolated?", i.ToString()));
                     }
+                    else
+                    {
+                        var pathLinks = DA.get_ParameterTargetPath(1).AppendElement(i);
+
+                        resultLinks.AppendRange(GhWrapTypeArray<int, GH_Integer>(edges), pathLinks);
+                        resultDirs.AppendRange(GhWrapTypeArray<bool, GH_Boolean>(dir), pathLinks);
+                        resultLengths.Add(tot);
+                    }
 
                     resultCurves.Add(current);
-
-                    var pathLinks = DA.get_ParameterTargetPath(1).AppendElement(i);
-
-                    resultLinks.AppendRange(GhWrapTypeArray<int, GH_Integer>(edges), pathLinks);
-                    resultDirs.AppendRange(GhWrapTypeArray<bool, GH_Boolean>(dir), pathLinks);
-                    resultLengths.Add(tot);
                 }
 
                 DA.SetDataList(0, resultCurves);
