@@ -1,5 +1,5 @@
-ShortestWalk plug-in
-===================
+ShortestWalk
+============
 
 This utility exposes a single command, ShortestWalk, which, given a network of curves, calculates the shortest path from position to the other.
 It is based on a line-based topology calculator that supports tolerance and the Dijkstra + A* search algorithms.
