@@ -11,7 +11,8 @@ Get Involved
 ------------
 There are many ways to contribute to this project:
 
-* Download and improve this sourcecode though github
+* Download a compiled version from http://www.food4rhino.com/project/shortestwalk
+* Improve the sourcecode by forking and editing with github
 * Post definitions and pictures on the Grasshopper group located at http://www.grasshopper3d.com/group/shortestwalk
 
 Authors
