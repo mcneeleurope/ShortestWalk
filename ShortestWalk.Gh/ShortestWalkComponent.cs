@@ -143,7 +143,9 @@ namespace ShortestWalk.Gh
                     }
                     else
                     {
-                        var pathLinks = DA.get_ParameterTargetPath(1).AppendElement(i);
+                        var pathLinks = DA.ParameterTargetPath(1).AppendElement(i);
+                        //GH 0.8 code
+                        //var pathLinks = DA.get_ParameterTargetPath(1).AppendElement(i);
 
                         resultLinks.AppendRange(GhWrapTypeArray<int, GH_Integer>(edges), pathLinks);
                         resultDirs.AppendRange(GhWrapTypeArray<bool, GH_Boolean>(dir), pathLinks);
